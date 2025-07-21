@@ -47,8 +47,12 @@ export class Server {
             const page = await browser.newPage();
             await page.goto(url, { waitUntil: 'networkidle0' });
 
-            const pdfBuffer = await page.pdf({ format: 'A4' });
+            await page.emulateMediaType('screen');
 
+           
+
+
+        
             res.set({
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': 'attachment; filename=generated.pdf',
@@ -65,12 +69,12 @@ export class Server {
     };
 
     htmpToPdfContent = async (req, res) => {
-        const  html = req.body;
+        const html = req.body;
 
         if (!html) {
             return res.status(400).json({ error: 'HTML content is required in the request body' });
         }
-
+        
         let browser;
         try {
             browser = await puppeteer.launch();
@@ -78,7 +82,11 @@ export class Server {
 
             await page.setContent(html, { waitUntil: 'networkidle0' });
 
-            const pdfBuffer = await page.pdf({ format: 'A4' });
+             const pdfBuffer = await page.pdf({
+                format: 'A4',
+                printBackground: true,
+                landscape: true
+            });
 
             res.set({
                 'Content-Type': 'application/pdf',
